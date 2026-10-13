@@ -14,7 +14,7 @@ import {
   uitloggen,
   gebruiktSupabase,
 } from './data.js';
-import { maakSchema, losOp, wisselSpelers, isVerwijzing, PLEKKEN } from './indeling.js';
+import { maakSchema, losOp, wisselSpelers, mogelijkeSpelers, isVerwijzing, PLEKKEN } from './indeling.js';
 import { winnaarVan } from './stand.js';
 import { esc, vanRonde, rondeKlaar, rustSpelers, maakPlekNaam } from './ui.js';
 
@@ -76,12 +76,25 @@ const ververs = () => inWachtrij(laad);
 // of alleen tekst bij een plek die van een uitslag afhangt
 function plekHtml(ruw, klaar, plek, plekNaam) {
   if (isVerwijzing(ruw[plek])) return `<div class="vaste-plek">${plekNaam(klaar[plek])}</div>`;
+  // Wie in deze ronde al via een uitslag (kan) spelen, is hier niet te kiezen: die zou er dan dubbel in staan
+  const bezet = viaUitslag(ruw.ronde);
   const opties = [...spelers]
-    .filter((s) => s.actief || s.id === ruw[plek])
+    .filter((s) => (s.actief && !bezet.has(s.id)) || s.id === ruw[plek])
     .sort(opNaam)
     .map((s) => `<option value="${esc(s.id)}" ${s.id === ruw[plek] ? 'selected' : ''}>${esc(s.naam)}</option>`)
     .join('');
-  return `<select data-actie="wissel" data-speler="${esc(ruw[plek])}" aria-label="Speler">${opties}</select>`;
+  return `<select data-actie="wissel" data-ronde="${ruw.ronde}" data-speler="${esc(ruw[plek])}" aria-label="Speler">${opties}</select>`;
+}
+
+// Spelers die in deze ronde op een plek staan (of kunnen komen) die van een uitslag afhangt
+function viaUitslag(ronde) {
+  const ids = new Set();
+  for (const w of wedstrijden.filter((x) => x.ronde === ronde)) {
+    for (const plek of PLEKKEN) {
+      if (isVerwijzing(w[plek])) (mogelijkeSpelers(w[plek], opgelost) || []).forEach((id) => ids.add(id));
+    }
+  }
+  return ids;
 }
 
 // Scoreknoppen voor één team
@@ -169,7 +182,9 @@ function tekenRondes() {
     <section class="kaart">
       <div class="kaart-kop"><h2>Schema aanpassen</h2></div>
       <p class="uitleg">
-        Kies bij een speler een andere naam om die twee in het hele schema van plek te wisselen.
+        Kies bij een speler een andere naam om die twee te wisselen. Dat geldt alleen voor die ronde;
+        de andere rondes blijven zoals ze zijn. Kies je iemand die in die ronde rust heeft, dan
+        neemt die de plek over.
         Of loot alles opnieuw; daarmee verdwijnen ook de uitslagen.
       </p>
       <div class="knoppen"><button class="knop licht" data-actie="schema" data-loten="ja">Opnieuw loten</button></div>
@@ -287,14 +302,16 @@ async function maakNieuwSchema(loten) {
   if (gelukt) melding('Het schema is gemaakt.');
 }
 
-// Wisselt twee spelers in het hele schema van plek
-async function wissel(spelerA, spelerB) {
+// Wisselt twee spelers binnen één ronde. De andere rondes blijven zoals ze zijn.
+// Speelt spelerB niet in deze ronde, dan neemt die de plek van spelerA over.
+async function wissel(ronde, spelerA, spelerB) {
   if (spelerA === spelerB) return;
   if (heeftUitslagen() && !confirm('Er zijn al uitslagen ingevuld. Die blijven bij de wedstrijd staan, ook na het wisselen. Doorgaan?')) {
     teken(); // keuzelijst terugzetten
     return;
   }
-  const nieuw = wisselSpelers(wedstrijden, spelerA, spelerB);
+  const vanDezeRonde = wedstrijden.filter((w) => w.ronde === ronde);
+  const nieuw = wisselSpelers(vanDezeRonde, spelerA, spelerB);
   let gelukt = true;
   for (const w of nieuw) {
     const oud = wedstrijden.find((o) => o.id === w.id);
@@ -304,7 +321,23 @@ async function wissel(spelerA, spelerB) {
     }
   }
   await ververs();
-  if (gelukt) melding(`${naamVan(spelerA)} en ${naamVan(spelerB)} zijn gewisseld.`);
+  if (!gelukt) return;
+  const dubbel = dubbelePartners();
+  if (dubbel.length) melding(`Gewisseld. Let op: ${dubbel.join(' en ')} spelen nu twee keer samen.`, true);
+  else melding(`${naamVan(spelerA)} en ${naamVan(spelerB)} zijn gewisseld in ronde ${ronde}.`);
+}
+
+// Koppels die in het schema meer dan één keer samen spelen (alleen de namen die al vaststaan)
+function dubbelePartners() {
+  const geteld = new Map();
+  for (const w of opgelost) {
+    for (const [a, b] of [[w.team1_a, w.team1_b], [w.team2_a, w.team2_b]]) {
+      if (isVerwijzing(a) || isVerwijzing(b)) continue;
+      const sleutel = [a, b].sort().join('|');
+      geteld.set(sleutel, (geteld.get(sleutel) || 0) + 1);
+    }
+  }
+  return [...geteld].filter(([, aantal]) => aantal > 1).map(([sleutel]) => sleutel.split('|').map(naamVan).join(' & '));
 }
 
 // Verandert de uitslag wie er doorschuift terwijl latere rondes al een uitslag hebben? Dan eerst vragen.
@@ -378,7 +411,7 @@ document.addEventListener('change', (e) => {
   if (!veld) return;
   const { actie, id } = veld.dataset;
 
-  if (actie === 'wissel') wissel(veld.dataset.speler, veld.value);
+  if (actie === 'wissel') wissel(Number(veld.dataset.ronde), veld.dataset.speler, veld.value);
   if (actie === 'niveau') wijzigSpeler({ id, niveau: veld.value });
   if (actie === 'naam') {
     const naam = veld.value.trim();

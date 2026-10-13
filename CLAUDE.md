@@ -19,6 +19,7 @@ Web-app om een tennistoernooitje (dubbels, 2 banen, ±14 deelnemers) te organise
 - Plekken die van een uitslag afhangen zijn verwijzingen (`@W:1:2:0`) en vullen zichzelf in zodra de score is ingevoerd
 - Elke ervaren speler speelt 2 keer; 4 minder ervaren spelers spelen 3 keer, 3 spelen 2 keer
 - Nooit twee keer dezelfde partner (harde regel)
+- Wisselen in beheer geldt alleen voor die ene ronde (keuze van Thijs). De app waarschuwt als een koppel daardoor twee keer samen speelt
 - Teams zo gelijk mogelijk: winnaar naast verliezer
 - Ranglijst: winstpercentage, dan gemiddeld gamesaldo, dan gemiddeld gewonnen games, dan onderling resultaat; daarna gedeelde plek
 - Gelijke stand: één winnend punt bepaalt de winnaar, de games blijven gelijk

@@ -128,7 +128,7 @@ export function mogelijkeSpelers(verwijzing, opgelost) {
   return [...new Set(kandidaten)];
 }
 
-// Wisselt twee spelers in het hele schema, zodat alles blijft kloppen
+// Wisselt twee spelers in de meegegeven wedstrijden (beheer geeft alleen die van één ronde mee)
 export function wisselSpelers(wedstrijden, spelerA, spelerB) {
   const ruil = (id) => (id === spelerA ? spelerB : id === spelerB ? spelerA : id);
   return wedstrijden.map((w) => {
