@@ -19,7 +19,7 @@ export const CONFIG = {
   // De gekozen loting: de volgorde bepaalt wie op welke plek in het schema staat.
   // "Schema maken" gebruikt deze volgorde, "Opnieuw loten" kiest een willekeurige.
   VASTE_LOTING: {
-    ervaren: ['Stijn', 'Remco', 'Thijs', 'Demi', 'Jesse', 'Sjoerd', 'Bart'],
+    ervaren: ['Remco', 'Stijn', 'Thijs', 'Demi', 'Jesse', 'Sjoerd', 'Bart'],
     minderErvaren: ['Hein', 'Max', 'Lorenzo', 'Harvey', 'Kim', 'Isis', 'Steven'],
   },
 };
