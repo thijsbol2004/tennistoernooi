@@ -7,18 +7,19 @@ create table spelers (
   id uuid primary key default gen_random_uuid(),
   naam text not null,
   niveau text not null check (niveau in ('ervaren', 'beginner')),
-  actief boolean not null default true,
-  doorgeschoven boolean not null default false
+  actief boolean not null default true
 );
 
 create table wedstrijden (
   id uuid primary key default gen_random_uuid(),
   ronde int not null,
   baan int not null,
-  team1_a uuid not null references spelers (id),
-  team1_b uuid not null references spelers (id),
-  team2_a uuid not null references spelers (id),
-  team2_b uuid not null references spelers (id),
+  -- Een plek is het id van een speler, of een verwijzing zoals '@W:1:2:0'
+  -- (winnaar van ronde 1, baan 2, eerste speler van dat team)
+  team1_a text not null,
+  team1_b text not null,
+  team2_a text not null,
+  team2_b text not null,
   score1 int,
   score2 int,
   -- Alleen nodig bij een gelijke stand: wie won het winnende punt (team 1 of 2)
@@ -63,3 +64,11 @@ alter publication supabase_realtime add table spelers, wedstrijden;
 -- Haal de twee streepjes weg, vul je eigen e-mailadres in en voer alleen deze regel uit:
 
 -- insert into beheerders select id from auth.users where email = 'JOUW-EMAILADRES';
+
+-- ---------- Deelnemers ----------
+
+insert into spelers (naam, niveau) values
+  ('Thijs', 'ervaren'), ('Stijn', 'ervaren'), ('Jesse', 'ervaren'),
+  ('Demi', 'ervaren'), ('Sjoerd', 'ervaren'), ('Bart', 'ervaren'), ('Remco', 'ervaren'),
+  ('Harvey', 'beginner'), ('Isis', 'beginner'), ('Lorenzo', 'beginner'), ('Kim', 'beginner'),
+  ('Hein', 'beginner'), ('Max', 'beginner'), ('Steven', 'beginner');

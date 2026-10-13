@@ -2,13 +2,14 @@
 import { CONFIG, rondeTijden } from './config.js';
 import { laadSpelers, laadWedstrijden, abonneer, gebruiktSupabase } from './data.js';
 import { berekenStand } from './stand.js';
+import { losOp } from './indeling.js';
 import {
   esc,
   vanRonde,
   huidigeRonde,
-  laatsteKlareRonde,
   toernooiKlaar,
   rustSpelers,
+  maakPlekNaam,
   wedstrijdHtml,
   saldoTekst,
 } from './ui.js';
@@ -17,10 +18,9 @@ const inhoud = document.getElementById('inhoud');
 const tijden = rondeTijden();
 
 let spelers = [];
-let wedstrijden = [];
+let wedstrijden = []; // het schema met alle bekende namen ingevuld
 let tab = 'nu';
 
-const namen = () => new Map(spelers.map((s) => [s.id, s.naam]));
 const tijdVan = (ronde) => tijden.find((t) => t.ronde === ronde);
 
 // ---------- Onderdelen ----------
@@ -30,18 +30,19 @@ function rondeHtml(ronde, kop) {
   const lijst = vanRonde(ronde, wedstrijden);
   const tijd = tijdVan(ronde);
   const rust = rustSpelers(ronde, spelers, wedstrijden);
+  const plekNaam = maakPlekNaam(spelers, wedstrijden);
+
+  let onder = '';
+  if (rust) onder = `<p class="rust"><strong>Rust:</strong> ${rust.map((s) => esc(s.naam)).join(', ') || 'niemand'}</p>`;
+  else if (lijst.length) onder = '<p class="rust">De open plekken worden ingevuld zodra de uitslagen binnen zijn.</p>';
+
   return `
     <section class="kaart">
       <div class="kaart-kop">
         <h2>${kop || `Ronde ${ronde}`}</h2>
         <span class="tijd">${tijd.start} – ${tijd.eind}</span>
       </div>
-      ${
-        lijst.length
-          ? lijst.map((w) => wedstrijdHtml(w, namen())).join('') +
-            (rust.length ? `<p class="rust"><strong>Rust:</strong> ${rust.map((s) => esc(s.naam)).join(', ')}</p>` : '')
-          : '<p class="leeg">Nog niet ingedeeld.</p>'
-      }
+      ${lijst.length ? lijst.map((w) => wedstrijdHtml(w, plekNaam)).join('') + onder : '<p class="leeg">Nog niet ingedeeld.</p>'}
     </section>`;
 }
 
@@ -76,16 +77,8 @@ function tekenNu() {
   }
 
   const ronde = huidigeRonde(wedstrijden);
-  if (ronde === null) {
-    const laatste = laatsteKlareRonde(wedstrijden);
-    return `
-      <section class="kaart"><p class="leeg">Ronde ${laatste} is afgelopen. De indeling van ronde ${laatste + 1} volgt zo.</p></section>
-      ${rondeHtml(laatste, `Uitslag ronde ${laatste}`)}`;
-  }
-
   const volgende = ronde + 1;
-  const heeftVolgende = vanRonde(volgende, wedstrijden).length > 0;
-  return rondeHtml(ronde, `Nu: ronde ${ronde}`) + (heeftVolgende ? rondeHtml(volgende, `Hierna: ronde ${volgende}`) : '');
+  return rondeHtml(ronde, `Nu: ronde ${ronde}`) + (volgende <= CONFIG.AANTAL_RONDES ? rondeHtml(volgende, `Hierna: ronde ${volgende}`) : '');
 }
 
 function tekenSchema() {
@@ -137,7 +130,9 @@ function teken() {
 
 async function ververs() {
   try {
-    [spelers, wedstrijden] = await Promise.all([laadSpelers(), laadWedstrijden()]);
+    const [nieuweSpelers, ruw] = await Promise.all([laadSpelers(), laadWedstrijden()]);
+    spelers = nieuweSpelers;
+    wedstrijden = losOp(ruw);
     teken();
   } catch (fout) {
     inhoud.innerHTML = `<section class="kaart"><p class="leeg">Laden mislukt: ${esc(fout.message)}</p></section>`;

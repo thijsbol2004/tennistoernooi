@@ -1,199 +1,139 @@
-// Maakt de indeling per ronde en het doorschuifvoorstel.
+// Het vaste toernooischema voor 7 ervaren en 7 minder ervaren spelers.
+// Het hele schema wordt in één keer gemaakt. Plekken die van een uitslag afhangen
+// zijn verwijzingen ("de winnaar van ronde 1, baan 2") en vullen zichzelf in
+// zodra die uitslag is ingevoerd.
 import { CONFIG, NIVEAU } from './config.js';
-import { berekenStand, spelersVan } from './stand.js';
+import { winnaarVan } from './stand.js';
 
-// Vaste sleutel voor een tweetal, ongeacht de volgorde
-const sleutel = (a, b) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+// De vier plekken van een wedstrijd: team 1 (a en b) en team 2 (a en b)
+export const PLEKKEN = ['team1_a', 'team1_b', 'team2_a', 'team2_b'];
 
-// Alle tweetallen die al eens samen een team vormden
-export function partnerParen(wedstrijden) {
-  const paren = new Set();
-  for (const w of wedstrijden) {
-    if (w.team1_a && w.team1_b) paren.add(sleutel(w.team1_a, w.team1_b));
-    if (w.team2_a && w.team2_b) paren.add(sleutel(w.team2_a, w.team2_b));
-  }
-  return paren;
+// Verwijzing naar de winnaar (W) of verliezer (L) van een eerdere wedstrijd.
+// plek 0 = de eerste speler van dat team, plek 1 = de tweede.
+const W = (ronde, baan, plek) => `@W:${ronde}:${baan}:${plek}`;
+const L = (ronde, baan, plek) => `@L:${ronde}:${baan}:${plek}`;
+
+// E1-E7 = ervaren spelers, B1-B7 = minder ervaren spelers (worden geloot).
+// Per regel: ronde, baan, team 1 (2 plekken), team 2 (2 plekken).
+// Regel van het toernooi: wie op baan 2 wint, speelt de ronde erna op baan 1.
+const SJABLOON = [
+  [1, 1, 'E1', 'E2', 'E3', 'E4'],
+  [1, 2, 'B1', 'B2', 'B3', 'B4'],
+  [2, 1, 'E5', W(1, 2, 0), 'E6', W(1, 2, 1)],
+  [2, 2, 'B5', 'B6', 'B7', L(1, 2, 0)],
+  [3, 1, 'E7', W(2, 2, 0), 'E1', W(2, 2, 1)],
+  [3, 2, L(1, 2, 1), L(2, 2, 0), L(2, 2, 1), W(1, 2, 0)],
+  [4, 1, 'E2', 'E3', 'E4', 'E5'],
+  [4, 2, 'E6', W(2, 2, 0), 'E7', W(1, 2, 1)],
+];
+
+export const isVerwijzing = (waarde) => typeof waarde === 'string' && waarde.startsWith('@');
+
+// Haalt een verwijzing uit elkaar, bijv. '@W:1:2:0'
+export function leesVerwijzing(waarde) {
+  const [soort, ronde, baan, plek] = waarde.slice(1).split(':');
+  return { wint: soort === 'W', ronde: Number(ronde), baan: Number(baan), plek: Number(plek) };
 }
 
-// Hoe vaak twee spelers al tegenover elkaar stonden
-function tegenstanderTelling(wedstrijden) {
-  const telling = new Map();
-  for (const w of wedstrijden) {
-    for (const a of [w.team1_a, w.team1_b]) {
-      for (const b of [w.team2_a, w.team2_b]) {
-        if (!a || !b) continue;
-        telling.set(sleutel(a, b), (telling.get(sleutel(a, b)) || 0) + 1);
-      }
-    }
-  }
-  return telling;
+// Zet een lijst in willekeurige volgorde
+function schud(lijst) {
+  return lijst
+    .map((item) => [Math.random(), item])
+    .sort((a, b) => a[0] - b[0])
+    .map(([, item]) => item);
 }
 
-// Per speler: hoe vaak ingedeeld en in welke ronde voor het laatst
-function speelInfo(wedstrijden) {
-  const info = new Map();
-  for (const w of wedstrijden) {
-    for (const id of spelersVan(w)) {
-      if (!id) continue;
-      const huidig = info.get(id) || { gespeeld: 0, laatsteRonde: 0 };
-      huidig.gespeeld += 1;
-      huidig.laatsteRonde = Math.max(huidig.laatsteRonde, w.ronde);
-      info.set(id, huidig);
-    }
-  }
-  return info;
+// Zet de spelers in de volgorde van de vaste loting.
+// Geeft null als de namen niet precies overeenkomen (dan wordt er geloot).
+function inVasteVolgorde(groep, namen) {
+  if (!namen || namen.length !== groep.length) return null;
+  const opVolgorde = namen.map((naam) => groep.find((s) => s.naam === naam));
+  return opVolgorde.every(Boolean) ? opVolgorde : null;
 }
 
-// Welke spelers horen in deze ronde op welke baan
-export function poolsVoorRonde(ronde, spelers) {
+// Maakt het hele schema. Geeft { wedstrijden } terug, of { fout } als de aantallen niet kloppen.
+// loten = true: willekeurige loting. Anders de vaste loting uit config.js, als die past.
+export function maakSchema(spelers, loten = false) {
   const actief = spelers.filter((s) => s.actief);
-  const gescheiden = ronde <= CONFIG.GESCHEIDEN_RONDES;
-  const opBaan1 = (s) => s.niveau === NIVEAU.ERVAREN || (!gescheiden && s.doorgeschoven);
-  return {
-    1: actief.filter(opBaan1),
-    2: actief.filter((s) => !opBaan1(s)),
-  };
-}
+  let ervaren = actief.filter((s) => s.niveau === NIVEAU.ERVAREN);
+  let beginners = actief.filter((s) => s.niveau === NIVEAU.BEGINNER);
 
-// De drie manieren om vier spelers in twee teams te verdelen
-function verdelingen([a, b, c, d]) {
-  return [
-    [[a, b], [c, d]],
-    [[a, c], [b, d]],
-    [[a, d], [b, c]],
-  ];
-}
+  const vast = CONFIG.VASTE_LOTING || {};
+  ervaren = (!loten && inVasteVolgorde(ervaren, vast.ervaren)) || schud(ervaren);
+  beginners = (!loten && inVasteVolgorde(beginners, vast.minderErvaren)) || schud(beginners);
 
-// Zoekt de beste wedstrijd voor één baan.
-// Kandidaten: [{ id, extra }] waarbij extra = aanvulling vanaf de andere baan.
-function besteWedstrijd(kandidaten, hulp) {
-  const { info, paren, tegenstanders, kracht } = hulp;
-  let beste = null;
+  if (ervaren.length !== 7 || beginners.length !== 7) {
+    return {
+      fout: `Het schema is gemaakt voor 7 ervaren en 7 minder ervaren spelers. Nu zijn dat er ${ervaren.length} en ${beginners.length}.`,
+    };
+  }
 
-  const n = kandidaten.length;
-  for (let i = 0; i < n; i++)
-    for (let j = i + 1; j < n; j++)
-      for (let k = j + 1; k < n; k++)
-        for (let l = k + 1; l < n; l++) {
-          const vier = [kandidaten[i], kandidaten[j], kandidaten[k], kandidaten[l]];
-
-          // Voorrang: wie het minst speelde, daarna wie het langst rust had
-          let keuzeKosten = 0;
-          for (const s of vier) {
-            const { gespeeld, laatsteRonde } = info.get(s.id) || { gespeeld: 0, laatsteRonde: 0 };
-            keuzeKosten += gespeeld * 100 + laatsteRonde + (s.extra ? 1000 : 0);
-          }
-
-          for (const [team1, team2] of verdelingen(vier.map((s) => s.id))) {
-            // Harde regel: nooit twee keer dezelfde partner
-            if (paren.has(sleutel(...team1)) || paren.has(sleutel(...team2))) continue;
-
-            // Teams even sterk maken: zo komt de winnaar naast de verliezer
-            const verschil = Math.abs(
-              kracht(team1[0]) + kracht(team1[1]) - kracht(team2[0]) - kracht(team2[1])
-            );
-
-            // Liever geen tegenstanders die elkaar al troffen
-            let herhaling = 0;
-            for (const a of team1) for (const b of team2) herhaling += tegenstanders.get(sleutel(a, b)) || 0;
-
-            // Klein beetje toeval, zodat gelijke opties geloot worden
-            const kosten = keuzeKosten * 10 + verschil + herhaling * 0.1 + Math.random() * 0.01;
-            if (!beste || kosten < beste.kosten) beste = { kosten, team1, team2 };
-          }
-        }
-
-  return beste;
-}
-
-// Genereert een voorstel voor één ronde.
-// Geeft terug: { wedstrijden, rust (speler-id's), waarschuwingen }
-export function genereerRonde(ronde, spelers, wedstrijden) {
-  // Bestaande wedstrijden van deze ronde tellen niet mee, die worden vervangen
-  const andere = wedstrijden.filter((w) => w.ronde !== ronde);
-
-  const stand = new Map(berekenStand(spelers, andere).map((r) => [r.id, r]));
-  const hulp = {
-    info: speelInfo(andere),
-    paren: partnerParen(andere),
-    tegenstanders: tegenstanderTelling(andere),
-    // Sterkte op basis van de tussenstand; zonder wedstrijden neutraal
-    kracht: (id) => {
-      const r = stand.get(id);
-      return r && r.gespeeld ? r.winstPct + r.gemSaldo / 20 : 0.5;
-    },
+  // Vervangt E1, B3 enzovoort door een echte speler; verwijzingen blijven staan
+  const vul = (code) => {
+    if (isVerwijzing(code)) return code;
+    const groep = code[0] === 'E' ? ervaren : beginners;
+    return groep[Number(code.slice(1)) - 1].id;
   };
 
-  const pools = poolsVoorRonde(ronde, spelers);
-  const actief = spelers.filter((s) => s.actief);
-  const bezet = new Set();
-  const nieuw = [];
-  const waarschuwingen = [];
-
-  for (const baan of [1, 2]) {
-    let kandidaten = pools[baan].filter((s) => !bezet.has(s.id)).map((s) => ({ id: s.id, extra: false }));
-
-    // Te weinig spelers voor deze baan: aanvullen met spelers van de andere baan
-    if (kandidaten.length < 4) {
-      const eigen = new Set(kandidaten.map((k) => k.id));
-      const aanvulling = actief
-        .filter((s) => !bezet.has(s.id) && !eigen.has(s.id))
-        .map((s) => ({ id: s.id, extra: true }));
-      kandidaten = [...kandidaten, ...aanvulling];
-    }
-
-    const beste = besteWedstrijd(kandidaten, hulp);
-    if (!beste) {
-      waarschuwingen.push(`Baan ${baan}: geen indeling mogelijk zonder dubbele partners of te weinig spelers.`);
-      continue;
-    }
-
-    [...beste.team1, ...beste.team2].forEach((id) => bezet.add(id));
-    nieuw.push({
-      ronde,
-      baan,
-      team1_a: beste.team1[0],
-      team1_b: beste.team1[1],
-      team2_a: beste.team2[0],
-      team2_b: beste.team2[1],
-      score1: null,
-      score2: null,
-      winnaar: null,
-    });
-  }
-
-  const rust = actief.filter((s) => !bezet.has(s.id)).map((s) => s.id);
-  return { wedstrijden: nieuw, rust, waarschuwingen };
+  const wedstrijden = SJABLOON.map(([ronde, baan, a, b, c, d]) => ({
+    ronde,
+    baan,
+    team1_a: vul(a),
+    team1_b: vul(b),
+    team2_a: vul(c),
+    team2_b: vul(d),
+    score1: null,
+    score2: null,
+    winnaar: null,
+  }));
+  return { wedstrijden };
 }
 
-// Controleert een (handmatig aangepaste) ronde. Geeft een lijst met fouten terug.
-export function controleerRonde(ronde, rondeWedstrijden, wedstrijden, spelers) {
-  const naam = (id) => spelers.find((s) => s.id === id)?.naam || 'Onbekend';
-  const paren = partnerParen(wedstrijden.filter((w) => w.ronde !== ronde));
-  const fouten = [];
-  const gezien = new Set();
+// Vult alle verwijzingen in waarvan de uitslag bekend is.
+// Geeft kopieën terug met een extra veld: compleet = alle vier de namen zijn bekend.
+export function losOp(wedstrijden) {
+  const opVolgorde = [...wedstrijden].sort((a, b) => a.ronde - b.ronde || a.baan - b.baan);
+  const klaar = [];
 
-  for (const w of rondeWedstrijden) {
-    const ids = spelersVan(w);
-    if (ids.some((id) => !id)) {
-      fouten.push(`Baan ${w.baan}: niet alle vier de plekken zijn gevuld.`);
-      continue;
+  for (const w of opVolgorde) {
+    const kopie = { ...w };
+    for (const plek of PLEKKEN) {
+      if (!isVerwijzing(w[plek])) continue;
+      const v = leesVerwijzing(w[plek]);
+      const bron = klaar.find((k) => k.ronde === v.ronde && k.baan === v.baan);
+      const winnaar = bron && bron.compleet ? winnaarVan(bron) : null;
+      if (winnaar === null) continue; // uitslag nog niet bekend
+      const team = v.wint ? winnaar : 3 - winnaar;
+      kopie[plek] = bron[`team${team}_${v.plek === 0 ? 'a' : 'b'}`];
     }
-    for (const id of ids) {
-      if (gezien.has(id)) fouten.push(`${naam(id)} staat twee keer in deze ronde.`);
-      gezien.add(id);
-    }
-    for (const [a, b] of [[w.team1_a, w.team1_b], [w.team2_a, w.team2_b]]) {
-      if (paren.has(sleutel(a, b))) fouten.push(`${naam(a)} en ${naam(b)} waren al eerder partners.`);
-    }
+    kopie.compleet = PLEKKEN.every((plek) => !isVerwijzing(kopie[plek]));
+    klaar.push(kopie);
   }
-  return fouten;
+  return klaar;
 }
 
-// Stelt de best presterende minder ervaren spelers voor om door te schuiven
-export function doorschuifVoorstel(spelers, wedstrijden, aantal = CONFIG.AANTAL_DOORSCHUIVEN) {
-  return berekenStand(spelers, wedstrijden)
-    .filter((r) => r.niveau === NIVEAU.BEGINNER && r.actief && r.gespeeld > 0)
-    .slice(0, aantal)
-    .map((r) => r.id);
+// Alle spelers die op een nog open plek kunnen komen (of null als dat niet te zeggen is).
+// Meestal twee; drie als een van de kandidaten zelf nog van een uitslag afhangt.
+export function mogelijkeSpelers(verwijzing, opgelost) {
+  const v = leesVerwijzing(verwijzing);
+  const bron = opgelost.find((w) => w.ronde === v.ronde && w.baan === v.baan);
+  if (!bron) return null;
+  const letter = v.plek === 0 ? 'a' : 'b';
+  const kandidaten = [];
+  for (const waarde of [bron[`team1_${letter}`], bron[`team2_${letter}`]]) {
+    const dieper = isVerwijzing(waarde) ? mogelijkeSpelers(waarde, opgelost) : [waarde];
+    if (!dieper) return null;
+    kandidaten.push(...dieper);
+  }
+  return [...new Set(kandidaten)];
+}
+
+// Wisselt twee spelers in het hele schema, zodat alles blijft kloppen
+export function wisselSpelers(wedstrijden, spelerA, spelerB) {
+  const ruil = (id) => (id === spelerA ? spelerB : id === spelerB ? spelerA : id);
+  return wedstrijden.map((w) => {
+    const kopie = { ...w };
+    for (const plek of PLEKKEN) kopie[plek] = ruil(w[plek]);
+    return kopie;
+  });
 }

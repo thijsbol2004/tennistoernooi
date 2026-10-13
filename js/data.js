@@ -1,5 +1,5 @@
 // Datalaag: alle opslag loopt via dit bestand.
-// Zonder Supabase-gegevens in config.js: opslag in de browser (localStorage) met testdata.
+// Zonder Supabase-gegevens in config.js: opslag in de browser (localStorage).
 // Met Supabase-gegevens: gedeelde database, login en live updates.
 import { CONFIG, NIVEAU } from './config.js';
 
@@ -30,15 +30,16 @@ function controleer({ data, error }) {
 
 // ---------- Hulpfuncties lokaal ----------
 
-// 14 testspelers: 6 ervaren en 8 minder ervaren
-function testSpelers() {
-  return Array.from({ length: 14 }, (_, i) => ({
-    id: `test-${i + 1}`,
-    naam: i < 6 ? `Ervaren ${i + 1}` : `Speler ${i + 1}`,
-    niveau: i < 6 ? NIVEAU.ERVAREN : NIVEAU.BEGINNER,
-    actief: true,
-    doorgeschoven: false,
-  }));
+// De deelnemers waarmee de lokale versie start
+const ERVAREN = ['Thijs', 'Stijn', 'Jesse', 'Demi', 'Sjoerd', 'Bart', 'Remco'];
+const MINDER_ERVAREN = ['Harvey', 'Isis', 'Lorenzo', 'Kim', 'Hein', 'Max', 'Steven'];
+
+function startSpelers() {
+  const maak = (naam, niveau) => ({ id: `speler-${naam.toLowerCase()}`, naam, niveau, actief: true });
+  return [
+    ...ERVAREN.map((naam) => maak(naam, NIVEAU.ERVAREN)),
+    ...MINDER_ERVAREN.map((naam) => maak(naam, NIVEAU.BEGINNER)),
+  ];
 }
 
 function lees(sleutel) {
@@ -64,7 +65,7 @@ export async function laadSpelers() {
   }
   let spelers = lees(SLEUTEL_SPELERS);
   if (!spelers) {
-    spelers = testSpelers();
+    spelers = startSpelers();
     schrijf(SLEUTEL_SPELERS, spelers);
   }
   return spelers;
@@ -82,7 +83,7 @@ export async function bewaarSpeler(speler) {
   const spelers = await laadSpelers();
   const bestaand = spelers.find((s) => s.id === speler.id);
   if (bestaand) Object.assign(bestaand, speler);
-  else spelers.push({ id: nieuwId(), actief: true, doorgeschoven: false, ...speler });
+  else spelers.push({ id: nieuwId(), actief: true, ...speler });
   schrijf(SLEUTEL_SPELERS, spelers);
 }
 
@@ -110,31 +111,24 @@ export async function bewaarWedstrijd(wedstrijd) {
   schrijf(SLEUTEL_WEDSTRIJDEN, wedstrijden);
 }
 
-// Vervangt de hele indeling van één ronde
-export async function vervangRonde(ronde, nieuweWedstrijden) {
+// Vervangt het hele schema door een nieuw schema
+export async function vervangSchema(nieuweWedstrijden) {
   if (gebruiktSupabase) {
     const db = await supabase();
-    controleer(await db.from('wedstrijden').delete().eq('ronde', ronde));
-    if (nieuweWedstrijden.length) {
-      controleer(await db.from('wedstrijden').insert(nieuweWedstrijden.map((w) => ({ ...w, ronde }))));
-    }
+    controleer(await db.from('wedstrijden').delete().gte('ronde', 0));
+    controleer(await db.from('wedstrijden').insert(nieuweWedstrijden));
     return;
   }
-  const overige = (await laadWedstrijden()).filter((w) => w.ronde !== ronde);
-  const nieuw = nieuweWedstrijden.map((w) => ({ id: nieuwId(), ...w, ronde }));
-  schrijf(SLEUTEL_WEDSTRIJDEN, [...overige, ...nieuw]);
+  schrijf(SLEUTEL_WEDSTRIJDEN, nieuweWedstrijden.map((w) => ({ id: nieuwId(), ...w })));
 }
 
-// Wist alle wedstrijden en doorschuivingen, de spelers blijven staan
+// Wist alle wedstrijden, de spelers blijven staan
 export async function resetToernooi() {
   if (gebruiktSupabase) {
     const db = await supabase();
     controleer(await db.from('wedstrijden').delete().gte('ronde', 0));
-    controleer(await db.from('spelers').update({ doorgeschoven: false }).eq('doorgeschoven', true));
     return;
   }
-  const spelers = (await laadSpelers()).map((s) => ({ ...s, doorgeschoven: false }));
-  schrijf(SLEUTEL_SPELERS, spelers);
   schrijf(SLEUTEL_WEDSTRIJDEN, []);
 }
 

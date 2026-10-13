@@ -12,10 +12,15 @@ export const CONFIG = {
   SPEELTIJD: 25, // minuten per ronde
   WISSELTIJD: 5, // minuten tussen de rondes
 
-  // Opzet
+  // Het schema zelf staat in js/indeling.js (SJABLOON)
   AANTAL_RONDES: 4,
-  GESCHEIDEN_RONDES: 2, // zoveel rondes spelen ervaren en minder ervaren apart
-  AANTAL_DOORSCHUIVEN: 2, // zoveel spelers schuiven daarna door naar baan 1
+
+  // De gekozen loting: de volgorde bepaalt wie op welke plek in het schema staat.
+  // "Schema maken" gebruikt deze volgorde, "Opnieuw loten" kiest een willekeurige.
+  VASTE_LOTING: {
+    ervaren: ['Stijn', 'Remco', 'Thijs', 'Demi', 'Jesse', 'Sjoerd', 'Bart'],
+    minderErvaren: ['Hein', 'Max', 'Lorenzo', 'Harvey', 'Kim', 'Isis', 'Steven'],
+  },
 };
 
 // De twee niveaus zoals ze in de database staan
