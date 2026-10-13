@@ -1,8 +1,9 @@
 // Instellingen van het toernooi. Alles wat je wilt aanpassen staat hier.
 export const CONFIG = {
   // Supabase-koppeling. Leeg laten = de app werkt lokaal met testdata.
-  SUPABASE_URL: '',
-  SUPABASE_KEY: '',
+  // Dit is de publieke sleutel; die mag in de code staan.
+  SUPABASE_URL: 'https://qveetnojychbrworryak.supabase.co',
+  SUPABASE_KEY: 'sb_publishable_fJswGIwqXC41guh_zOHgIA_MsSCdVD-',
 
   TOERNOOI_NAAM: 'Tennistoernooi',
 
