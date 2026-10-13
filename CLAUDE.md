@@ -20,7 +20,7 @@ Web-app om een tennistoernooitje (dubbels, 2 banen, ±14 deelnemers) te organise
 - Elke ervaren speler speelt 2 keer; 4 minder ervaren spelers spelen 3 keer, 3 spelen 2 keer
 - Nooit twee keer dezelfde partner (harde regel)
 - Teams zo gelijk mogelijk: winnaar naast verliezer
-- Ranglijst: winstpercentage, dan gemiddeld gamesaldo, dan gemiddeld gewonnen games
+- Ranglijst: winstpercentage, dan gemiddeld gamesaldo, dan gemiddeld gewonnen games, dan onderling resultaat; daarna gedeelde plek
 - Gelijke stand: één winnend punt bepaalt de winnaar, de games blijven gelijk
 - Top 2 van de ranglijst wint
 
@@ -42,9 +42,8 @@ De testserver kan niet rechtstreeks uit de Documenten-map lezen (macOS-rechten).
 
 ## Stand van zaken
 
-- [x] Stap 1: basis en logica zonder database
-- [x] Stap 2: publieke pagina (Nu / Schema / Stand)
-- [x] Stap 3: beheerpagina
-- [ ] Stap 4: Supabase koppelen (code en `supabase/schema.sql` staan klaar; project aanmaken en gegevens in `js/config.js` zetten moet nog)
-- [ ] Stap 5: online zetten via GitHub Pages
-- [ ] Stap 6: echte deelnemers invoeren
+- Live op https://thijsbol2004.github.io/tennistoernooi/ (repo `thijsbol2004/tennistoernooi`, GitHub Pages vanaf `main`)
+- Supabase-project `qveetnojychbrworryak` is gekoppeld; het schema met de vaste loting staat in de database
+- Bewust niet gebouwd: variant voor een afmelding, zwaardere telling voor baan 1
+- Nog open: Doublesmart-logo en Gellix-lettertype (bestanden van Thijs nodig)
+- Niet aanpassen vlak voor of tijdens het toernooi: browsers onthouden de oude versie tot ±10 minuten

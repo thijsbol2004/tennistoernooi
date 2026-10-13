@@ -67,11 +67,12 @@ function tekenNu() {
   }
 
   if (toernooiKlaar(wedstrijden)) {
-    const top = berekenStand(spelers, wedstrijden).slice(0, 2);
+    // Bij een gedeelde plek kunnen er meer dan twee winnaars zijn
+    const top = berekenStand(spelers, wedstrijden).filter((r) => r.rang <= 2);
     return `
       <section class="kaart podium">
         <h2>🏆 Winnaars</h2>
-        ${top.map((r, i) => `<div class="podium-plek"><span class="plek">${i + 1}</span><span>${esc(r.naam)}</span></div>`).join('')}
+        ${top.map((r) => `<div class="podium-plek"><span class="plek">${r.rang}</span><span>${esc(r.naam)}</span></div>`).join('')}
         <p class="rust">Bekijk de volledige eindstand onder Stand.</p>
       </section>`;
   }
@@ -117,6 +118,7 @@ function tekenStand() {
       <p class="uitleg">
         Volgorde: eerst het percentage gewonnen wedstrijden, daarna het gemiddelde gamesaldo per wedstrijd
         (gewonnen min verloren games). Zo maakt het niet uit of je 2 of 3 keer hebt gespeeld.
+        Staan spelers dan nog gelijk, dan telt het onderling resultaat. Is ook dat gelijk, dan delen ze de plek.
       </p>
     </section>`;
 }

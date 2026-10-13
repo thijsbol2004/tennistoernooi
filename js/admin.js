@@ -270,7 +270,13 @@ const heeftUitslagen = () => wedstrijden.some((w) => w.score1 != null);
 
 // Loot de spelers en maakt het hele schema
 async function maakNieuwSchema(loten) {
-  if (heeftUitslagen() && !confirm('Er zijn al uitslagen ingevuld. Opnieuw loten wist die. Doorgaan?')) return;
+  // Opnieuw loten vraagt altijd om bevestiging, zodat een verkeerde tik het schema niet omgooit
+  if (loten) {
+    const vraag = heeftUitslagen()
+      ? 'Opnieuw loten maakt een heel nieuw schema en wist alle uitslagen. Doorgaan?'
+      : 'Opnieuw loten maakt een heel nieuw schema. Iedereen ziet dan een andere indeling. Doorgaan?';
+    if (!confirm(vraag)) return;
+  }
   const { wedstrijden: nieuw, fout } = maakSchema(spelers, loten);
   if (fout) {
     melding(fout, true);
