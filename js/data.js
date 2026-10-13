@@ -162,6 +162,14 @@ export async function isIngelogd() {
   return Boolean(data.session);
 }
 
+// Staat het ingelogde account in de tabel beheerders? Alleen dan mag het iets wijzigen.
+export async function isBeheerder() {
+  if (!gebruiktSupabase) return true;
+  const db = await supabase();
+  const rijen = controleer(await db.from('beheerders').select('user_id').limit(1));
+  return rijen.length > 0;
+}
+
 export async function inloggen(email, wachtwoord) {
   const db = await supabase();
   const { error } = await db.auth.signInWithPassword({ email, password: wachtwoord });

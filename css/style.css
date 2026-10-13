@@ -646,3 +646,18 @@ label.veld {
   border-radius: 10px;
   font-size: 0.92rem;
 }
+
+/* Beheer: waarschuwing dat het account geen rechten heeft */
+.kaart.waarschuwing {
+  border: 2px solid var(--rood);
+}
+
+.kaart.waarschuwing code {
+  display: block;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--lila-licht);
+  font-size: 0.8rem;
+  word-break: break-word;
+}

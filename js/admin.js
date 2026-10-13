@@ -9,6 +9,7 @@ import {
   resetToernooi,
   abonneer,
   isIngelogd,
+  isBeheerder,
   inloggen,
   uitloggen,
   gebruiktSupabase,
@@ -26,6 +27,7 @@ let wedstrijden = []; // het schema zoals het is opgeslagen, met verwijzingen
 let opgelost = []; // hetzelfde schema met alle bekende namen ingevuld
 let tab = 'rondes';
 let ingelogd = false;
+let beheerder = true; // false = wel ingelogd, maar geen rechten om te wijzigen
 
 const naamVan = (id) => spelers.find((s) => s.id === id)?.naam || '?';
 const niveauTekst = (niveau) => (niveau === NIVEAU.ERVAREN ? 'Ervaren' : 'Minder ervaren');
@@ -48,8 +50,16 @@ function melding(tekst, isFout = false) {
 // Alle schrijfacties en verversingen lopen achter elkaar, zodat snel tikken niets door elkaar gooit
 let wachtrij = Promise.resolve();
 
+// Geeft true terug als de taak gelukt is, anders false (en toont dan de fout)
 function inWachtrij(taak) {
-  wachtrij = wachtrij.then(taak).catch((fout) => melding(`Er ging iets mis: ${fout.message}`, true));
+  wachtrij = wachtrij.then(taak).then(
+    () => true,
+    (fout) => {
+      const geenRechten = fout.message.includes('row-level security');
+      melding(geenRechten ? 'Opslaan geweigerd: dit account heeft geen beheerrechten.' : `Er ging iets mis: ${fout.message}`, true);
+      return false;
+    }
+  );
   return wachtrij;
 }
 
@@ -242,7 +252,16 @@ function teken() {
     return;
   }
   document.querySelectorAll('[data-tab]').forEach((knop) => knop.classList.toggle('actief', knop.dataset.tab === tab));
-  inhoud.innerHTML = tab === 'rondes' ? tekenRondes() : tekenSpelers();
+  const waarschuwing = beheerder
+    ? ''
+    : `<section class="kaart waarschuwing">
+         <div class="kaart-kop"><h2>Dit account mag nog niets wijzigen</h2></div>
+         <p class="uitleg">Je bent ingelogd, maar dit account staat niet in de tabel <strong>beheerders</strong> in Supabase.
+         Wijzigingen worden daardoor niet opgeslagen. Voer in de SQL Editor de regel
+         <code>insert into beheerders select id from auth.users where email = '...';</code> uit met het e-mailadres
+         waarmee je hier bent ingelogd, en ververs daarna deze pagina.</p>
+       </section>`;
+  inhoud.innerHTML = waarschuwing + (tab === 'rondes' ? tekenRondes() : tekenSpelers());
 }
 
 // ---------- Acties ----------
@@ -257,9 +276,9 @@ async function maakNieuwSchema(loten) {
     melding(fout, true);
     return;
   }
-  inWachtrij(() => vervangSchema(nieuw));
+  const gelukt = await inWachtrij(() => vervangSchema(nieuw));
   await ververs();
-  melding('Het schema is gemaakt.');
+  if (gelukt) melding('Het schema is gemaakt.');
 }
 
 // Wisselt twee spelers in het hele schema van plek
@@ -270,15 +289,16 @@ async function wissel(spelerA, spelerB) {
     return;
   }
   const nieuw = wisselSpelers(wedstrijden, spelerA, spelerB);
+  let gelukt = true;
   for (const w of nieuw) {
     const oud = wedstrijden.find((o) => o.id === w.id);
     if (PLEKKEN.some((plek) => w[plek] !== oud[plek])) {
       const { id, team1_a, team1_b, team2_a, team2_b } = w;
-      inWachtrij(() => bewaarWedstrijd({ id, team1_a, team1_b, team2_a, team2_b }));
+      inWachtrij(() => bewaarWedstrijd({ id, team1_a, team1_b, team2_a, team2_b })).then((ok) => (gelukt = gelukt && ok));
     }
   }
   await ververs();
-  melding(`${naamVan(spelerA)} en ${naamVan(spelerB)} zijn gewisseld.`);
+  if (gelukt) melding(`${naamVan(spelerA)} en ${naamVan(spelerB)} zijn gewisseld.`);
 }
 
 // Verandert de uitslag wie er doorschuift terwijl latere rondes al een uitslag hebben? Dan eerst vragen.
@@ -310,8 +330,9 @@ function pasScoreAan(wedstrijdId, team, delta) {
 }
 
 async function wijzigSpeler(velden) {
-  inWachtrij(() => bewaarSpeler(velden));
+  const gelukt = await inWachtrij(() => bewaarSpeler(velden));
   await ververs();
+  return gelukt;
 }
 
 // ---------- Gebeurtenissen ----------
@@ -335,8 +356,7 @@ document.addEventListener('click', (e) => {
   if (actie === 'wis-uitslag') zetUitslag(id, { score1: null, score2: null, winnaar: null });
   if (actie === 'actief') wijzigSpeler({ id, actief: !spelers.find((s) => s.id === id).actief });
   if (actie === 'reset' && confirm('Het schema en alle uitslagen wissen? Dit kan niet ongedaan worden.')) {
-    inWachtrij(resetToernooi);
-    ververs().then(() => melding('Het toernooi is leeggemaakt.'));
+    inWachtrij(resetToernooi).then((gelukt) => ververs().then(() => gelukt && melding('Het toernooi is leeggemaakt.')));
   }
   if (actie === 'uitloggen') {
     uitloggen().then(() => {
@@ -369,14 +389,15 @@ document.addEventListener('submit', async (e) => {
   if (e.target.id === 'nieuwe-speler') {
     const naam = gegevens.get('naam').trim();
     if (!naam) return;
-    await wijzigSpeler({ naam, niveau: gegevens.get('niveau'), actief: true });
-    melding(`${naam} is toegevoegd.`);
+    const gelukt = await wijzigSpeler({ naam, niveau: gegevens.get('niveau'), actief: true });
+    if (gelukt) melding(`${naam} is toegevoegd.`);
   }
 
   if (e.target.id === 'login') {
     try {
       await inloggen(gegevens.get('email'), gegevens.get('wachtwoord'));
       ingelogd = true;
+      beheerder = await isBeheerder();
       await ververs();
     } catch (fout) {
       melding(fout.message, true);
@@ -390,6 +411,7 @@ async function start() {
   document.getElementById('testmodus').hidden = gebruiktSupabase;
   try {
     ingelogd = await isIngelogd();
+    if (ingelogd) beheerder = await isBeheerder();
   } catch (fout) {
     melding(`Verbinden mislukt: ${fout.message}`, true);
   }
