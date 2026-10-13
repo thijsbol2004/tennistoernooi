@@ -3,22 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#ceff69" />
     <meta name="robots" content="noindex" />
     <title>Beheer tennistoernooi</title>
-    <!-- Lettertype dat lijkt op dat van Doublesmart -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="assets/beeldmerk.svg" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
     <header class="kop">
+      <div class="kop-balk">
+        <!-- Logo van Doublesmart: altijd linksboven -->
+        <img class="logo" src="assets/doublesmart-logo.svg" alt="Doublesmart" width="163" height="27" />
+        <span class="kop-knoppen">
+          <button id="uitloggen" data-actie="uitloggen" hidden>Uitloggen</button>
+          <a class="beheer-link" href="index.html">Naar de app</a>
+        </span>
+      </div>
       <h1>Beheer</h1>
-      <span>
-        <button id="uitloggen" data-actie="uitloggen" hidden>Uitloggen</button>
-        <a class="beheer-link" href="index.html">Naar de app</a>
-      </span>
     </header>
 
     <!-- Melding zolang er nog geen database gekoppeld is -->

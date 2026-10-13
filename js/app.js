@@ -71,7 +71,7 @@ function tekenNu() {
     const top = berekenStand(spelers, wedstrijden).filter((r) => r.rang <= 2);
     return `
       <section class="kaart podium">
-        <h2>🏆 Winnaars</h2>
+        <h2>Winnaars</h2>
         ${top.map((r) => `<div class="podium-plek"><span class="plek">${r.rang}</span><span>${esc(r.naam)}</span></div>`).join('')}
         <p class="rust">Bekijk de volledige eindstand onder Stand.</p>
       </section>`;

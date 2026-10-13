@@ -106,7 +106,7 @@ function beheerWedstrijdHtml(ruw, plekNaam) {
     </button>`;
 
   return `
-    <div class="wedstrijd ${klaar.compleet ? '' : 'open'}">
+    <div class="wedstrijd baan-${ruw.baan} ${klaar.compleet ? '' : 'open'}">
       <div class="baan-label">Baan ${ruw.baan}</div>
       <div class="beheer-team">
         ${plekHtml(ruw, klaar, 'team1_a', plekNaam)}${plekHtml(ruw, klaar, 'team1_b', plekNaam)}

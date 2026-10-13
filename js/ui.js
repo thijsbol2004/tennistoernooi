@@ -71,7 +71,7 @@ export function wedstrijdHtml(w, plekNaam) {
       <span class="score">${score ?? '–'}</span>
     </div>`;
   return `
-    <div class="wedstrijd ${w.compleet ? '' : 'open'}">
+    <div class="wedstrijd baan-${w.baan} ${w.compleet ? '' : 'open'}">
       <div class="baan-label">Baan ${w.baan}</div>
       ${team(1, w.team1_a, w.team1_b, w.score1)}
       ${team(2, w.team2_a, w.team2_b, w.score2)}

@@ -1,67 +1,128 @@
 /* Opmaak voor de publieke pagina en de beheerpagina. Eerst voor telefoons gemaakt.
-   Kleuren en vormen volgen de huisstijl van Doublesmart. */
+   Kleuren, lettertype en vormen volgen de huisstijlgids van Doublesmart. */
+
+/* ---------- Lettertype: Gellix, het merkfont van Doublesmart ---------- */
+
+@font-face {
+  font-family: 'Gellix';
+  src: url('../assets/fonts/GellixRegular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gellix';
+  src: url('../assets/fonts/GellixMedium.otf') format('opentype');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gellix';
+  src: url('../assets/fonts/GellixSemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gellix';
+  src: url('../assets/fonts/GellixBold.otf') format('opentype');
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ---------- Kleuren uit de huisstijlgids ---------- */
 
 :root {
-  /* Huisstijl Doublesmart: wit en zwart met lime, teal en lila als accent */
-  --hoofd: #000000;
-  --accent: #ceff68;
-  --accent-licht: #f1ffd4;
-  --teal: #37b79f;
-  --lila: #b191d6;
-  --lila-licht: #f8f6fd;
-  --achtergrond: #f8f6fd;
-  --kaart: #ffffff;
-  --tekst: #000000;
-  --tekst-zacht: #5f5f5f;
-  --lijn: #e0e0e0;
-  --rood: #b3261e;
+  --digital: #000000; /* tekst, koppen, logo */
+  --digital-80: #313131;
+  --fun: #ceff69; /* lime: het vaste accent */
+  --fun-50: #e7fcbe;
+  --fun-20: #f5ffe1;
+  --smart: #c4a8e0; /* paars: tweede accent */
+  --smart-50: #e1d3ef;
+  --smart-20: #f8f6fd;
+  --cosy-50: #ffeeea; /* zacht vlak voor meldingen */
+  --cosy: #ffdfd6;
+  --paneel: #f5f5f5; /* grijze panelen */
+  --lijn: #e0e0e0; /* dunne lijnen */
+  --bijschrift: #6b6b6b; /* kleine, zachte tekst */
+  --rood: #b3261e; /* alleen voor fouten en gevaarlijke knoppen */
+  --rond: 12px;
 }
 
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 16px;
-  line-height: 1.4;
-  color: var(--tekst);
-  background: var(--achtergrond);
-  /* Ruimte voor de tabbalk onderaan */
-  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+/* Twee keer snel tikken mag het scherm niet vergroten (knijpen om te zoomen blijft werken) */
+html {
+  touch-action: manipulation;
 }
 
-/* ---------- Kop ---------- */
+body {
+  margin: 0;
+  font-family: 'Gellix', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--digital);
+  background: #fff;
+  /* Ruimte voor de tabbalk onderaan */
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Kop: lime vlak met het logo linksboven ---------- */
 
 .kop {
-  position: sticky;
-  top: 0;
-  z-index: 5;
+  padding: 16px 16px 20px;
+  background-color: var(--fun);
+  /* Subtiel lijnengrid, een van de vaste vormen uit de huisstijl */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  border-radius: 0 0 20px 20px;
+}
+
+.kop-balk {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
-  background: var(--hoofd);
-  color: #fff;
-  border-bottom: 4px solid var(--accent);
+  max-width: 608px;
+  margin: 0 auto 22px;
+}
+
+.logo {
+  display: block;
+  height: 22px;
+  width: auto;
 }
 
 .kop h1 {
-  margin: 0;
-  font-size: 1.2rem;
+  max-width: 608px;
+  margin: 0 auto;
+  font-size: 1.9rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.kop-knoppen {
+  display: flex;
+  gap: 8px;
 }
 
 .beheer-link,
 .kop button {
-  color: #fff;
+  font: inherit;
   font-size: 0.85rem;
-  opacity: 0.85;
+  font-weight: 600;
+  color: var(--digital);
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1.5px solid var(--digital);
   border-radius: 999px;
-  padding: 5px 12px;
+  padding: 5px 14px;
   text-decoration: none;
   cursor: pointer;
 }
@@ -71,8 +132,8 @@ body {
   padding: 6px 16px;
   font-size: 0.8rem;
   text-align: center;
-  background: #fff4d6;
-  color: #6b5200;
+  background: var(--smart-20);
+  color: var(--digital-80);
 }
 
 /* ---------- Inhoud ---------- */
@@ -83,12 +144,12 @@ main {
   padding: 16px;
 }
 
+/* Grijs paneel met ronde hoeken, zonder kader */
 .kaart {
-  background: var(--kaart);
-  border: 1px solid var(--lijn);
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 14px;
+  background: var(--paneel);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .kaart-kop {
@@ -96,17 +157,21 @@ main {
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .kaart h2 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 .tijd {
   font-size: 0.9rem;
-  color: var(--tekst-zacht);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--bijschrift);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -114,8 +179,8 @@ main {
 .leeg,
 .rust,
 .uitleg {
-  margin: 8px 0 0;
-  color: var(--tekst-zacht);
+  margin: 10px 0 0;
+  color: var(--bijschrift);
   font-size: 0.9rem;
 }
 
@@ -123,34 +188,44 @@ main {
   margin: 4px 0;
 }
 
+.rust strong {
+  font-weight: 600;
+  color: var(--digital);
+}
+
 /* ---------- Wedstrijd ---------- */
 
 .wedstrijd {
-  border: 1px solid var(--lijn);
-  border-left: 5px solid var(--teal);
-  border-radius: 10px;
-  padding: 8px 10px;
+  background: #fff;
+  border-radius: var(--rond);
+  padding: 12px;
   margin-bottom: 8px;
 }
 
+/* Baan als chip: baan 1 lime, baan 2 paars */
 .baan-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--teal);
-  margin-bottom: 2px;
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 2px 10px;
+  margin-bottom: 4px;
+  background: var(--fun);
+}
+
+.wedstrijd.baan-2 .baan-label {
+  background: var(--smart);
 }
 
 .team {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 0;
+  padding: 6px 0;
 }
 
 .team + .team {
-  border-top: 1px dashed var(--lijn);
+  border-top: 1px solid var(--lijn);
 }
 
 .team .namen {
@@ -159,31 +234,52 @@ main {
 }
 
 .team .en {
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
 }
 
 .team .score {
-  min-width: 1.6em;
-  text-align: right;
+  min-width: 1.9em;
+  text-align: center;
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
 }
 
-.team.winnaar .namen,
+.team.winnaar .namen {
+  font-weight: 600;
+}
+
+/* Winnaar: lime vlak achter de score */
 .team.winnaar .score {
   font-weight: 700;
-  color: var(--hoofd);
+  color: var(--digital);
+  background: var(--fun);
+  border-radius: 8px;
 }
 
 .wp {
   font-size: 0.7rem;
-  background: var(--accent);
-  color: var(--tekst);
+  font-weight: 500;
+  background: var(--fun-50);
   border-radius: 999px;
   padding: 2px 8px;
   white-space: nowrap;
+}
+
+/* Wedstrijd waarvan nog niet alle namen bekend zijn */
+.wedstrijd.open {
+  background: none;
+  border: 1.5px dashed var(--lijn);
+}
+
+.wedstrijd.open .baan-label {
+  background: var(--lijn);
+}
+
+/* Open plek in het schema: "Harvey of Lorenzo" */
+.of {
+  color: var(--bijschrift);
 }
 
 /* ---------- Tijdschema ---------- */
@@ -197,7 +293,7 @@ main {
 .tijdschema li {
   display: flex;
   justify-content: space-between;
-  padding: 7px 0;
+  padding: 8px 0;
   border-top: 1px solid var(--lijn);
   font-variant-numeric: tabular-nums;
 }
@@ -210,22 +306,25 @@ main {
 
 .stand {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
   font-size: 0.92rem;
+  background: #fff;
+  border-radius: var(--rond);
 }
 
+/* Koprij in een lichte lime tint */
 .stand th {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--tekst-zacht);
+  font-size: 0.78rem;
   font-weight: 600;
-  padding: 4px 4px 6px;
+  padding: 8px 6px;
   text-align: right;
+  background: var(--fun-50);
 }
 
 .stand td {
-  padding: 8px 4px;
+  padding: 9px 6px;
   border-top: 1px solid var(--lijn);
 }
 
@@ -243,18 +342,30 @@ main {
 .stand td:first-child,
 .stand th:first-child {
   text-align: left;
-  padding-left: 8px;
+  padding-left: 12px;
 }
 
+.stand td:last-child,
+.stand th:last-child {
+  padding-right: 12px;
+}
+
+/* De plekken die winnen */
 .stand tr.top td {
-  background: var(--accent-licht);
-  font-weight: 700;
+  background: var(--fun-20);
+  font-weight: 600;
 }
 
-/* ---------- Podium ---------- */
+/* ---------- Podium: donker vlak met lime accent ---------- */
+
+.kaart.podium {
+  background: var(--digital);
+  color: #fff;
+}
 
 .podium h2 {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 1.6rem;
 }
 
 .podium-plek {
@@ -263,19 +374,25 @@ main {
   gap: 12px;
   padding: 10px;
   margin-bottom: 8px;
-  border-radius: 10px;
-  background: var(--accent-licht);
-  font-size: 1.15rem;
-  font-weight: 700;
+  border-radius: var(--rond);
+  background: var(--digital-80);
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .plek {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--fun);
+  color: var(--digital);
+  font-weight: 700;
+}
+
+.podium .rust {
+  color: #cfcfcf;
 }
 
 /* ---------- Tabbalk onderaan ---------- */
@@ -287,45 +404,52 @@ main {
   bottom: 0;
   z-index: 5;
   display: flex;
-  background: var(--kaart);
+  gap: 6px;
+  background: #fff;
   border-top: 1px solid var(--lijn);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+}
+
+/* Staat de balk uit (inlogscherm), dan mag de flex-opmaak hem niet toch tonen */
+.tabs[hidden] {
+  display: none;
 }
 
 .tabs button {
   flex: 1;
-  padding: 18px 4px;
+  min-height: 48px;
   font: inherit;
   font-weight: 600;
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
   background: none;
   border: none;
-  border-top: 3px solid transparent;
+  border-radius: 999px;
   cursor: pointer;
 }
 
 .tabs button.actief {
-  color: var(--hoofd);
-  border-top-color: var(--hoofd);
+  color: var(--digital);
+  background: var(--fun);
 }
 
 /* ---------- Beheer: knoppen en formulieren ---------- */
 
+/* Ronde knoppen; de belangrijkste actie is lime */
 .knop {
   font: inherit;
   font-weight: 600;
   min-height: 44px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--hoofd);
-  background: var(--hoofd);
-  color: #fff;
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1.5px solid var(--fun);
+  background: var(--fun);
+  color: var(--digital);
   cursor: pointer;
 }
 
 .knop.licht {
   background: #fff;
-  color: var(--hoofd);
+  border-color: var(--digital);
 }
 
 .knop.gevaar {
@@ -336,7 +460,7 @@ main {
 
 .knop.klein {
   min-height: 36px;
-  padding: 4px 12px;
+  padding: 4px 14px;
   font-size: 0.85rem;
 }
 
@@ -344,7 +468,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 input[type='text'],
@@ -354,18 +478,18 @@ select {
   font: inherit;
   min-height: 44px;
   width: 100%;
-  padding: 8px 10px;
+  padding: 8px 12px;
   border: 1px solid var(--lijn);
-  border-radius: 10px;
+  border-radius: var(--rond);
   background: #fff;
-  color: var(--tekst);
+  color: var(--digital);
 }
 
 label.veld {
   display: block;
   margin-bottom: 10px;
   font-size: 0.85rem;
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
 }
 
 /* Beheer: een wedstrijd met keuzelijsten en scoreknoppen */
@@ -379,7 +503,20 @@ label.veld {
 
 .beheer-team select {
   min-height: 40px;
-  padding: 4px 6px;
+  padding: 4px 8px;
+  font-size: 0.92rem;
+  background: var(--paneel);
+  border-color: var(--paneel);
+}
+
+/* Plek die van een uitslag afhangt en dus niet te kiezen is */
+.vaste-plek {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 4px 8px;
+  border: 1.5px dashed var(--lijn);
+  border-radius: var(--rond);
   font-size: 0.92rem;
 }
 
@@ -394,19 +531,27 @@ label.veld {
 .teller .label {
   flex: 1;
   font-size: 0.8rem;
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
 }
 
 .teller button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 1px solid var(--hoofd);
+  border: 1.5px solid var(--digital);
   background: #fff;
-  color: var(--hoofd);
+  color: var(--digital);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
+}
+
+/* Snel tikken op de scoreknoppen mag geen tekst selecteren */
+.teller button,
+.teller .getal {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .teller .getal {
@@ -420,32 +565,34 @@ label.veld {
 .tegen {
   text-align: center;
   font-size: 0.75rem;
-  color: var(--tekst-zacht);
-  border-top: 1px dashed var(--lijn);
+  color: var(--bijschrift);
+  border-top: 1px solid var(--lijn);
   padding-top: 4px;
 }
 
 .winnend-punt {
   margin-top: 8px;
   padding: 10px;
-  border-radius: 10px;
-  background: #fff4d6;
+  border-radius: var(--rond);
+  background: var(--smart-20);
+  border: 1px solid var(--smart);
   font-size: 0.9rem;
 }
 
+/* Status als chip */
 .status {
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 999px;
   padding: 2px 10px;
   background: var(--lijn);
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
   white-space: nowrap;
 }
 
 .status.klaar {
-  background: var(--accent-licht);
-  color: var(--hoofd);
+  background: var(--fun);
+  color: var(--digital);
 }
 
 /* Beheer: spelerslijst */
@@ -472,7 +619,7 @@ label.veld {
 
 .speler-rij.afgemeld input[type='text'] {
   text-decoration: line-through;
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
 }
 
 .vink {
@@ -486,14 +633,30 @@ label.veld {
 .vink input {
   width: 22px;
   height: 22px;
-  accent-color: var(--hoofd);
+  accent-color: var(--digital);
 }
 
 .vink .cijfers {
   margin-left: auto;
   font-size: 0.85rem;
-  color: var(--tekst-zacht);
+  color: var(--bijschrift);
   font-variant-numeric: tabular-nums;
+}
+
+/* Beheer: waarschuwing dat het account geen rechten heeft */
+.kaart.waarschuwing {
+  background: var(--cosy-50);
+  border: 2px solid var(--rood);
+}
+
+.kaart.waarschuwing code {
+  display: block;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.8rem;
+  word-break: break-word;
 }
 
 /* Melding onderin beeld */
@@ -506,9 +669,9 @@ label.veld {
   z-index: 10;
   max-width: 608px;
   margin: 0 auto;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: var(--tekst);
+  padding: 12px 16px;
+  border-radius: var(--rond);
+  background: var(--digital);
   color: #fff;
   font-size: 0.92rem;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
@@ -516,161 +679,4 @@ label.veld {
 
 .melding.fout {
   background: var(--rood);
-}
-
-/* ---------- Huisstijl Doublesmart ---------- */
-
-/* Witte kop met zwarte, kleine letters en een lime stip */
-.kop {
-  background: #fff;
-  color: var(--tekst);
-  border-bottom: 1px solid var(--lijn);
-}
-
-.kop h1 {
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.kop h1::before {
-  content: '';
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 2px solid var(--tekst);
-}
-
-.beheer-link,
-.kop button {
-  color: var(--tekst);
-  opacity: 1;
-  border-color: var(--tekst);
-  text-transform: lowercase;
-  font-weight: 600;
-}
-
-.kaart {
-  border-radius: 20px;
-}
-
-.kaart h2 {
-  font-weight: 500;
-  font-size: 1.15rem;
-}
-
-/* Knoppen: zwarte pillen met kleine letters, net als op de site */
-.knop {
-  border-radius: 22px;
-  text-transform: lowercase;
-  font-weight: 700;
-}
-
-.knop:not(.licht):not(.gevaar) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--tekst);
-}
-
-.knop.licht {
-  border-color: var(--tekst);
-  color: var(--tekst);
-}
-
-/* Winnaar: lime vlak achter de score */
-.team.winnaar .score {
-  background: var(--accent);
-  border-radius: 8px;
-  padding: 0 8px;
-  text-align: center;
-}
-
-.status.klaar,
-.stand tr.top td {
-  color: var(--tekst);
-}
-
-.status.klaar {
-  background: var(--accent);
-}
-
-.tabs button.actief {
-  color: var(--tekst);
-  background: var(--accent);
-  border-top-color: var(--tekst);
-}
-
-.testmodus {
-  background: var(--lila-licht);
-  color: #333;
-  border-bottom: 1px solid var(--lijn);
-}
-
-.winnend-punt {
-  background: var(--lila-licht);
-  border: 1px solid var(--lila);
-}
-
-.vink input {
-  accent-color: var(--teal);
-}
-
-/* Ronde die nog niet ingedeeld is */
-.wedstrijd.open {
-  border-style: dashed;
-  border-left-style: solid;
-  border-left-color: var(--lijn);
-  color: var(--tekst-zacht);
-}
-
-.wedstrijd.open .baan-label {
-  color: var(--tekst-zacht);
-}
-
-/* Open plek in het schema: "Harvey of Lorenzo" */
-.of {
-  font-style: italic;
-  color: var(--tekst-zacht);
-}
-
-/* Beheer: plek die van een uitslag afhangt en dus niet te kiezen is */
-.vaste-plek {
-  display: flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 4px 8px;
-  border: 1px dashed var(--lijn);
-  border-radius: 10px;
-  font-size: 0.92rem;
-}
-
-/* Beheer: waarschuwing dat het account geen rechten heeft */
-.kaart.waarschuwing {
-  border: 2px solid var(--rood);
-}
-
-.kaart.waarschuwing code {
-  display: block;
-  margin: 8px 0;
-  padding: 8px;
-  border-radius: 8px;
-  background: var(--lila-licht);
-  font-size: 0.8rem;
-  word-break: break-word;
-}
-
-/* Twee keer snel tikken mag het scherm niet vergroten (knijpen om te zoomen blijft werken) */
-html {
-  touch-action: manipulation;
-}
-
-/* Snel tikken op de scoreknoppen mag geen tekst selecteren */
-.teller button,
-.teller .getal {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
 }

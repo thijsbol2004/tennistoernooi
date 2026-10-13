@@ -4,7 +4,7 @@ Web-app om een tennistoernooitje (dubbels, 2 banen, ±14 deelnemers) te organise
 
 ## Techniek
 
-- Opmaak in de huisstijl van Doublesmart (wit/zwart, lime #ceff68, teal #37b79f, lila #b191d6, lettertype Outfit als vervanger van Gellix)
+- Opmaak volgens de huisstijlgids van Doublesmart (skill `doublesmart-huisstijl`): zwart, lime #ceff69, paars #c4a8e0, grijze panelen #f5f5f5, lettertype Gellix, logo linksboven. Geen emoji, geen tekst in kleine letters behalve het logo
 - HTML/CSS/JS zonder bouwstap (ES-modules), hosting via GitHub Pages
 - Supabase als database, login en live updates (wordt gekoppeld in stap 4)
 - Zonder Supabase-gegevens in `js/config.js` werkt de app lokaal met testdata in localStorage
@@ -34,6 +34,7 @@ Web-app om een tennistoernooitje (dubbels, 2 banen, ±14 deelnemers) te organise
 - `js/app.js` + `index.html`: publieke pagina
 - `js/admin.js` + `admin.html`: beheerpagina
 - `css/style.css`: opmaak
+- `assets/`: logo, beeldmerk (icoontje in het tabblad) en de Gellix-lettertypen
 - `supabase/schema.sql`: tabellen en toegangsregels
 
 ## Lokaal testen
@@ -45,5 +46,4 @@ De testserver kan niet rechtstreeks uit de Documenten-map lezen (macOS-rechten).
 - Live op https://thijsbol2004.github.io/tennistoernooi/ (repo `thijsbol2004/tennistoernooi`, GitHub Pages vanaf `main`)
 - Supabase-project `qveetnojychbrworryak` is gekoppeld; het schema met de vaste loting staat in de database
 - Bewust niet gebouwd: variant voor een afmelding, zwaardere telling voor baan 1
-- Nog open: Doublesmart-logo en Gellix-lettertype (bestanden van Thijs nodig)
 - Niet aanpassen vlak voor of tijdens het toernooi: browsers onthouden de oude versie tot ±10 minuten
