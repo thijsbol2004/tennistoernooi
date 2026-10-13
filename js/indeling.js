@@ -23,8 +23,8 @@ const SJABLOON = [
   [2, 2, 'B5', 'B6', 'B7', L(1, 2, 0)],
   [3, 1, 'E7', W(2, 2, 0), 'E1', W(2, 2, 1)],
   [3, 2, L(1, 2, 1), L(2, 2, 0), L(2, 2, 1), W(1, 2, 0)],
-  [4, 1, 'E2', 'E3', 'E4', 'E5'],
-  [4, 2, 'E6', W(2, 2, 0), 'E7', W(1, 2, 1)],
+  [4, 1, 'E6', 'E3', 'E7', 'E5'],
+  [4, 2, 'E2', W(2, 2, 0), 'E4', W(1, 2, 1)],
 ];
 
 export const isVerwijzing = (waarde) => typeof waarde === 'string' && waarde.startsWith('@');
