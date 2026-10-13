@@ -661,3 +661,16 @@ label.veld {
   font-size: 0.8rem;
   word-break: break-word;
 }
+
+/* Twee keer snel tikken mag het scherm niet vergroten (knijpen om te zoomen blijft werken) */
+html {
+  touch-action: manipulation;
+}
+
+/* Snel tikken op de scoreknoppen mag geen tekst selecteren */
+.teller button,
+.teller .getal {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
