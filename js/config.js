@@ -5,7 +5,7 @@ export const CONFIG = {
   SUPABASE_URL: 'https://qveetnojychbrworryak.supabase.co',
   SUPABASE_KEY: 'sb_publishable_fJswGIwqXC41guh_zOHgIA_MsSCdVD-',
 
-  TOERNOOI_NAAM: 'Tennistoernooi',
+  TOERNOOI_NAAM: 'DoubleTennistoernooi',
 
   // Tijden
   START_INSPELEN: '16:00',
