@@ -63,7 +63,7 @@ export function berekenStand(spelers, wedstrijden) {
       b.winstPct - a.winstPct ||
       b.gemSaldo - a.gemSaldo ||
       b.gemVoor - a.gemVoor ||
-      a.naam.localeCompare(b.naam)
+      a.naam.localeCompare(b.naam, 'nl', { numeric: true })
   );
 
   // Rangnummer: spelers met exact dezelfde cijfers delen een plek

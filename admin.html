@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1f5c3d" />
+    <meta name="robots" content="noindex" />
+    <title>Beheer tennistoernooi</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="kop">
+      <h1>Beheer</h1>
+      <span>
+        <button id="uitloggen" data-actie="uitloggen" hidden>Uitloggen</button>
+        <a class="beheer-link" href="index.html">Naar de app</a>
+      </span>
+    </header>
+
+    <!-- Melding zolang er nog geen database gekoppeld is -->
+    <p id="testmodus" class="testmodus" hidden>Testmodus: gegevens staan alleen op dit apparaat.</p>
+
+    <!-- Hier komt de inhoud van de gekozen tab of het inlogscherm -->
+    <main id="inhoud"><section class="kaart"><p class="leeg">Laden…</p></section></main>
+
+    <!-- Korte meldingen na een actie -->
+    <div id="melding" class="melding" role="status" hidden></div>
+
+    <nav class="tabs" hidden>
+      <button data-tab="rondes" class="actief">Rondes</button>
+      <button data-tab="spelers">Spelers</button>
+    </nav>
+
+    <script type="module" src="js/admin.js"></script>
+  </body>
+</html>

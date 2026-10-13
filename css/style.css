@@ -1,0 +1,515 @@
+/* Opmaak voor de publieke pagina en de beheerpagina. Eerst voor telefoons gemaakt. */
+
+:root {
+  --groen: #1f5c3d;
+  --groen-licht: #e6f1ea;
+  --geel: #d8e84a;
+  --gravel: #c8623a;
+  --achtergrond: #f3f5f1;
+  --kaart: #ffffff;
+  --tekst: #17231c;
+  --tekst-zacht: #5d6b62;
+  --lijn: #dde3dc;
+  --rood: #b3261e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--tekst);
+  background: var(--achtergrond);
+  /* Ruimte voor de tabbalk onderaan */
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Kop ---------- */
+
+.kop {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--groen);
+  color: #fff;
+  border-bottom: 4px solid var(--geel);
+}
+
+.kop h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.beheer-link,
+.kop button {
+  color: #fff;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  padding: 5px 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.testmodus {
+  margin: 0;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  text-align: center;
+  background: #fff4d6;
+  color: #6b5200;
+}
+
+/* ---------- Inhoud ---------- */
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.kaart {
+  background: var(--kaart);
+  border: 1px solid var(--lijn);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.kaart-kop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.kaart h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.tijd {
+  font-size: 0.9rem;
+  color: var(--tekst-zacht);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.leeg,
+.rust,
+.uitleg {
+  margin: 8px 0 0;
+  color: var(--tekst-zacht);
+  font-size: 0.9rem;
+}
+
+.leeg {
+  margin: 4px 0;
+}
+
+/* ---------- Wedstrijd ---------- */
+
+.wedstrijd {
+  border: 1px solid var(--lijn);
+  border-left: 5px solid var(--gravel);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+
+.baan-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gravel);
+  margin-bottom: 2px;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+.team + .team {
+  border-top: 1px dashed var(--lijn);
+}
+
+.team .namen {
+  flex: 1;
+  min-width: 0;
+}
+
+.team .en {
+  color: var(--tekst-zacht);
+}
+
+.team .score {
+  min-width: 1.6em;
+  text-align: right;
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--tekst-zacht);
+}
+
+.team.winnaar .namen,
+.team.winnaar .score {
+  font-weight: 700;
+  color: var(--groen);
+}
+
+.wp {
+  font-size: 0.7rem;
+  background: var(--geel);
+  color: var(--tekst);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+/* ---------- Tijdschema ---------- */
+
+.tijdschema {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tijdschema li {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 0;
+  border-top: 1px solid var(--lijn);
+  font-variant-numeric: tabular-nums;
+}
+
+.tijdschema li:first-child {
+  border-top: none;
+}
+
+/* ---------- Stand ---------- */
+
+.stand {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.stand th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tekst-zacht);
+  font-weight: 600;
+  padding: 4px 4px 6px;
+  text-align: right;
+}
+
+.stand td {
+  padding: 8px 4px;
+  border-top: 1px solid var(--lijn);
+}
+
+.stand .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.stand .naam {
+  text-align: left;
+  width: 100%;
+}
+
+.stand td:first-child,
+.stand th:first-child {
+  text-align: left;
+  padding-left: 8px;
+}
+
+.stand tr.top td {
+  background: var(--groen-licht);
+  font-weight: 700;
+}
+
+/* ---------- Podium ---------- */
+
+.podium h2 {
+  margin-bottom: 10px;
+}
+
+.podium-plek {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: var(--groen-licht);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.plek {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--geel);
+}
+
+/* ---------- Tabbalk onderaan ---------- */
+
+.tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  background: var(--kaart);
+  border-top: 1px solid var(--lijn);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabs button {
+  flex: 1;
+  padding: 18px 4px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--tekst-zacht);
+  background: none;
+  border: none;
+  border-top: 3px solid transparent;
+  cursor: pointer;
+}
+
+.tabs button.actief {
+  color: var(--groen);
+  border-top-color: var(--groen);
+}
+
+/* ---------- Beheer: knoppen en formulieren ---------- */
+
+.knop {
+  font: inherit;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--groen);
+  background: var(--groen);
+  color: #fff;
+  cursor: pointer;
+}
+
+.knop.licht {
+  background: #fff;
+  color: var(--groen);
+}
+
+.knop.gevaar {
+  background: #fff;
+  color: var(--rood);
+  border-color: var(--rood);
+}
+
+.knop.klein {
+  min-height: 36px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+}
+
+.knoppen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+select {
+  font: inherit;
+  min-height: 44px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--lijn);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--tekst);
+}
+
+label.veld {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: var(--tekst-zacht);
+}
+
+/* Beheer: een wedstrijd met keuzelijsten en scoreknoppen */
+
+.beheer-team {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.beheer-team select {
+  min-height: 40px;
+  padding: 4px 6px;
+  font-size: 0.92rem;
+}
+
+.teller {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.teller .label {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--tekst-zacht);
+}
+
+.teller button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--groen);
+  background: #fff;
+  color: var(--groen);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.teller .getal {
+  min-width: 1.6em;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tegen {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--tekst-zacht);
+  border-top: 1px dashed var(--lijn);
+  padding-top: 4px;
+}
+
+.winnend-punt {
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #fff4d6;
+  font-size: 0.9rem;
+}
+
+.status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 2px 10px;
+  background: var(--lijn);
+  color: var(--tekst-zacht);
+  white-space: nowrap;
+}
+
+.status.klaar {
+  background: var(--groen-licht);
+  color: var(--groen);
+}
+
+/* Beheer: spelerslijst */
+
+.speler-rij {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--lijn);
+}
+
+.speler-rij:first-of-type {
+  border-top: none;
+}
+
+.speler-rij .opties {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.speler-rij.afgemeld input[type='text'] {
+  text-decoration: line-through;
+  color: var(--tekst-zacht);
+}
+
+.vink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--lijn);
+}
+
+.vink input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--groen);
+}
+
+.vink .cijfers {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--tekst-zacht);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Melding onderin beeld */
+
+.melding {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 10;
+  max-width: 608px;
+  margin: 0 auto;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--tekst);
+  color: #fff;
+  font-size: 0.92rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.melding.fout {
+  background: var(--rood);
+}

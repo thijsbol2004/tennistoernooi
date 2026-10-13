@@ -25,12 +25,21 @@ Web-app om een tennistoernooitje (dubbels, 2 banen, ±14 deelnemers) te organise
 - `js/data.js`: alle opslag loopt hierlangs (localStorage of Supabase)
 - `js/indeling.js`: rondes genereren, controleren en doorschuifvoorstel
 - `js/stand.js`: ranglijst berekenen
+- `js/ui.js`: gedeelde hulpfuncties voor beide pagina's
+- `js/app.js` + `index.html`: publieke pagina
+- `js/admin.js` + `admin.html`: beheerpagina
+- `css/style.css`: opmaak
+- `supabase/schema.sql`: tabellen en toegangsregels
+
+## Lokaal testen
+
+De testserver kan niet rechtstreeks uit de Documenten-map lezen (macOS-rechten). Kopieer de app daarom naar een tijdelijke map en start daar `python3 -m http.server`.
 
 ## Stand van zaken
 
 - [x] Stap 1: basis en logica zonder database
-- [ ] Stap 2: publieke pagina (Nu / Schema / Stand)
-- [ ] Stap 3: beheerpagina
-- [ ] Stap 4: Supabase koppelen
+- [x] Stap 2: publieke pagina (Nu / Schema / Stand)
+- [x] Stap 3: beheerpagina
+- [ ] Stap 4: Supabase koppelen (code en `supabase/schema.sql` staan klaar; project aanmaken en gegevens in `js/config.js` zetten moet nog)
 - [ ] Stap 5: online zetten via GitHub Pages
 - [ ] Stap 6: echte deelnemers invoeren
